@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chatbot Question Session</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f6fa;min-height:100vh}
+  button{cursor:pointer;font-family:inherit}
+  textarea,input{font-family:inherit}
+  .header{background:linear-gradient(135deg,#1e1b4b,#4f46e5);padding:18px 24px;color:white}
+  .header h1{font-size:19px;font-weight:700}
+  .header p{font-size:12px;opacity:.7;margin-top:4px}
+  .pills{background:white;border-bottom:1px solid #e5e7eb;padding:10px 20px;display:flex;flex-wrap:wrap;gap:7px}
+  .pill{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid transparent}
+  .tabs{background:white;border-bottom:1px solid #e5e7eb;display:flex;align-items:center}
+  .tab{padding:12px 16px;border:none;background:none;font-size:13px;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;cursor:pointer}
+  .tab.active{color:#4f46e5;border-bottom-color:#4f46e5}
+  .clear-btn{margin-left:auto;margin-right:10px;padding:6px 12px;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;border-radius:6px;font-size:12px}
+  .content{max-width:820px;margin:0 auto;padding:22px 16px}
+  .card{background:white;border-radius:12px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:18px}
+  .card h2{font-size:18px;color:#1e1b4b;margin-bottom:6px}
+  .card .sub{color:#6b7280;font-size:13px;margin-bottom:20px;margin-top:8px}
+  label{display:block;font-weight:600;font-size:13px;margin-bottom:6px;color:#374151}
+  input[type=text],textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;margin-bottom:16px;outline:none}
+  input[type=text]:focus,textarea:focus{border-color:#4f46e5}
+  .type-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .type-btn{padding:7px 13px;border-radius:8px;border:2px solid #e5e7eb;background:white;font-size:13px;font-weight:600;color:#374151;transition:all .15s}
+  .submit-btn{padding:11px 26px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:14px;font-weight:700}
+  .submit-btn:disabled{background:#c7d2fe;cursor:not-allowed}
+  .success{color:#059669;font-weight:600;font-size:13px;margin-left:12px}
+  .error{color:#dc2626;font-weight:600;font-size:13px;margin-left:12px}
+  .q-card{background:white;border-radius:10px;padding:12px 16px;margin-bottom:8px;box-shadow:0 1px 5px rgba(0,0,0,.06)}
+  .q-meta{font-size:12px;color:#9ca3af;margin-top:5px}
+  .section-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .section-bar{width:4px;height:22px;border-radius:4px}
+  .cluster{background:white;border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+  .cluster-label{display:inline-block;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:8px}
+  .cluster-q{margin:5px 0;font-size:13px;padding-left:12px;border-left:3px solid #ccc;color:#374151;line-height:1.5}
+  .ai-btn{padding:11px 22px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:8px;font-size:14px;font-weight:700}
+  .ai-btn:disabled{background:#e5e7eb;color:#9ca3af;cursor:not-allowed}
+  .empty{text-align:center;padding:50px;color:#9ca3af;background:white;border-radius:12px}
+  .empty .icon{font-size:38px;margin-bottom:10px}
+  .badge{background:#4f46e5;color:white;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700}
+  .info-box{background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:16px;font-size:13px;color:#92400e}
+  /* Setup screen */
+  #setup{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+  .setup-card{background:white;border-radius:16px;padding:36px;max-width:480px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+  .setup-card h1{font-size:22px;color:#1e1b4b;margin-bottom:6px}
+  .setup-card .logo{font-size:36px;margin-bottom:14px}
+  .divider{text-align:center;color:#9ca3af;font-size:13px;margin:18px 0;position:relative}
+  .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#e5e7eb}
+  .divider::before{left:0}.divider::after{right:0}
+  .session-code-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;margin-bottom:16px}
+  .session-code-box .label{font-size:12px;color:#16a34a;font-weight:600;margin-bottom:4px}
+  .session-code-box .code{font-size:15px;font-weight:700;color:#14532d;font-family:monospace;letter-spacing:.5px;word-break:break-all}
+  .primary-btn{width:100%;padding:12px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700}
+  .secondary-btn{width:100%;padding:11px;background:white;color:#4f46e5;border:2px solid #4f46e5;border-radius:8px;font-size:15px;font-weight:700}
+  #app{display:none}
+  .header-row{display:flex;justify-content:space-between;align-items:center}
+  .stat{background:rgba(255,255,255,.15);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600}
+  .sync-info{font-size:11px;opacity:.6;margin-top:3px;text-align:right}
+  .export-textarea{width:100%;padding:14px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;font-family:monospace;background:#f9fafb;color:#111827;min-height:200px;resize:vertical}
+  .copy-btn{margin-top:10px;padding:8px 16px;border:1px solid #d1d5db;background:white;border-radius:7px;font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup">
+  <div class="setup-card">
+    <div class="logo">🧠</div>
+    <h1>AI Chatbot Question Session</h1>
+    <p style="color:#6b7280;font-size:14px;margin:6px 0 24px">Cross-functional team input collector</p>
+
+    <button class="primary-btn" onclick="createSession()">✨ Create New Session</button>
+
+    <div class="divider">or join an existing one</div>
+
+    <label>Session Code</label>
+    <input type="text" id="joinCode" placeholder="Paste session code here…" style="margin-bottom:10px">
+    <button class="secondary-btn" onclick="joinSession()">Join Session →</button>
+
+    <p id="setupMsg" style="color:#dc2626;font-size:13px;margin-top:12px;min-height:18px"></p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1>🧠 AI Chatbot Question Session</h1>
+        <p>Cross-functional team input collector</p>
+      </div>
+      <div>
+        <div class="stat" id="countBadge">0 submissions</div>
+        <div class="sync-info" id="syncInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session code bar -->
+  <div style="background:#1e1b4b;padding:8px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="color:#a5b4fc;font-size:12px;font-weight:600">SESSION CODE:</span>
+    <span id="sessionCodeDisplay" style="color:white;font-family:monospace;font-size:13px;font-weight:700;letter-spacing:.5px;word-break:break-all"></span>
+    <button onclick="copyCode()" style="padding:4px 10px;border:1px solid #a5b4fc;background:transparent;color:#a5b4fc;border-radius:5px;font-size:12px">📋 Copy</button>
+    <span style="color:#6b7280;font-size:12px;margin-left:auto">Share this code with attendees</span>
+  </div>
+
+  <!-- Object type pills -->
+  <div class="pills" id="pillsBar"></div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('submit',this)">✍️ Submit</button>
+    <button class="tab" onclick="switchTab('live',this)">📡 Live View</button>
+    <button class="tab" onclick="switchTab('grouped',this)">🤖 AI Grouping</button>
+    <button class="tab" onclick="switchTab('export',this)">📋 Export</button>
+    <button class="clear-btn" onclick="clearAll()">🗑 Clear All</button>
+  </div>
+
+  <div class="content">
+    <!-- SUBMIT TAB -->
+    <div id="tab-submit">
+      <div class="card">
+        <h2>Submit a Question</h2>
+        <p class="sub">What would a user want to ask the AI chatbot about this object type?</p>
+
+        <label>Your Name <span style="font-weight:400;color:#9ca3af">(optional)</span></label>
+        <input type="text" id="submitterInput" placeholder="e.g. Sarah">
+
+        <label>Object Type</label>
+        <div class="type-grid" id="typeGrid"></div>
+
+        <label>Sample Question</label>
+        <textarea id="questionInput" rows="4" placeholder="e.g. Show me all Controls that failed last quarter"></textarea>
+
+        <div style="display:flex;align-items:center">
+          <button class="submit-btn" id="submitBtn" onclick="submitQuestion()">Submit Question</button>
+          <span id="submitMsg"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE VIEW TAB -->
+    <div id="tab-live" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <p style="color:#6b7280;font-size:13px">🔄 Auto-refreshing every 5 seconds</p>
+        <button onclick="loadQuestions()" style="padding:6px 13px;border-radius:7px;border:1px solid #d1d5db;background:white;font-size:13px">↻ Refresh</button>
+      </div>
+      <div id="liveView"></div>
+    </div>
+
+    <!-- AI GROUPING TAB -->
+    <div id="tab-grouped" style="display:none">
+      <div class="card">
+        <p style="color:#374151;font-size:14px;margin-bottom:8px">Claude will cluster similar questions within each object type.</p>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:14px">To use AI grouping, enter your Anthropic API key below (it stays in your browser only).</p>
+        <label>Anthropic API Key <span style="font-weight:400;color:#9ca3af">(for AI grouping)</span></label>
+        <input type="text" id="anthropicKey" placeholder="sk-ant-…" style="margin-bottom:14px">
+        <button class="ai-btn" id="groupBtn" onclick="groupWithAI()">🤖 Auto-Group Now</button>
+      </div>
+      <div id="groupedView"></div>
+    </div>
+
+    <!-- EXPORT TAB -->
+    <div id="tab-export" style="display:none">
+      <div class="card">
+        <h2>All Submissions by Object Type</h2>
+        <div id="exportRaw"></div>
+      </div>
+      <div id="exportGrouped"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_KEY = '$2a$10$/9Tczqela67meXPeHSJ.5e3XFIlpU8.ippuL4S7jecCM3Qk/Kkvga';
+const BASE = 'https://api.jsonbin.io/v3';
+const OBJ_TYPES = ["Controls","Risks","Evidence","Monitoring Tests","Policies","Personnel","Other"];
+const COLORS = {"Controls":"#4f46e5","Risks":"#dc2626","Evidence":"#059669","Monitoring Tests":"#d97706","Policies":"#7c3aed","Personnel":"#0891b2","Other":"#6b7280"};
+
+let binId = null, questions = [], selectedType = OBJ_TYPES[0], groupedData = null, pollTimer = null;
+
+// --- SETUP ---
+async function createSession() {
+  setSetupMsg('Creating session…');
+  try {
+    const r = await fetch(`${BASE}/b`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Access-Key':API_KEY,'X-Bin-Name':'Session-'+Date.now()},
+      body: JSON.stringify({questions:[]})
+    });
+    const d = await r.json();
+    binId = d.metadata.id;
+    startApp();
+  } catch(e) { setSetupMsg('Error creating session. Check your connection.'); }
+}
+
+async function joinSession() {
+  const code = document.getElementById('joinCode').value.trim();
+  if (!code) { setSetupMsg('Please enter a session code.'); return; }
+  setSetupMsg('Joining…');
+  try {
+    const r = await fetch(`${BASE}/b/${code}/latest`, {headers:{'X-Access-Key':API_KEY}});
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    questions = d.record.questions || [];
+    binId = code;
+    startApp();
+  } catch(e) { setSetupMsg('Session not found. Check the code and try again.'); }
+}
+
+function setSetupMsg(msg) { document.getElementById('setupMsg').textContent = msg; }
+
+function startApp() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('sessionCodeDisplay').textContent = binId;
+  buildTypeGrid();
+  renderPills();
+  renderLive();
+  renderExport();
+  pollTimer = setInterval(loadQuestions, 5000);
+}
+
+function copyCode() {
+  navigator.clipboard?.writeText(binId);
+  const el = document.querySelector('[onclick="copyCode()"]');
+  el.textContent = '✅ Copied!';
+  setTimeout(() => el.textContent = '📋 Copy', 2000);
+}
+
+// --- DATA ---
+async function loadQuestions() {
+  try {
+    const r = await fetch(`${BASE}/b/${binId}/latest`, {headers:{'X-Access-Key':API_KEY}});
+    const d = await r.json();
+    questions = d.record.questions || [];
+    renderPills();
+    renderLive();
+    renderExport();
+    document.getElementById('syncInfo').textContent = 'Synced ' + new Date().toLocaleTimeString();
+    document.getElementById('countBadge').textContent = questions.length + ' submission' + (questions.length!==1?'s':'');
+  } catch(e){}
+}
+
+async function save() {
+  await fetch(`${BASE}/b/${binId}`, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-Access-Key':API_KEY},
+    body: JSON.stringify({questions})
+  });
+}
+
+// --- SUBMIT ---
+function buildTypeGrid() {
+  const grid = document.getElementById('typeGrid');
+  grid.innerHTML = '';
+  OBJ_TYPES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'type-btn';
+    btn.textContent = t;
+    btn.style.borderColor = t===selectedType ? COLORS[t] : '#e5e7eb';
+    btn.style.background = t===selectedType ? COLORS[t]+'18' : 'white';
+    btn.style.color = t===selectedType ? COLORS[t] : '#374151';
+    btn.onclick = () => { selectedType = t; buildTypeGrid(); document.getElementById('questionInput').placeholder = `e.g. Show me all ${t} that failed last quarter`; };
+    grid.appendChild(btn);
+  });
+}
+
+async function submitQuestion() {
+  const text = document.getElementById('questionInput').value.trim();
+  if (!text) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const submitter = document.getElementById('submitterInput').value.trim() || 'Anonymous';
+  const q = {id: Date.now(), text, objectType: selectedType, submitter, timestamp: new Date().toISOString()};
+  questions.push(q);
+  try {
+    await save();
+    document.getElementById('questionInput').value = '';
+    showMsg('success','✅ Submitted! Thanks.');
+    renderPills(); renderLive(); renderExport();
+  } catch(e) {
+    questions.pop();
+    showMsg('error','❌ Error. Try again.');
+  }
+  btn.disabled = false; btn.textContent = 'Submit Question';
+}
+
+function showMsg(type, text) {
+  const el = document.getElementById('submitMsg');
+  el.textContent = text;
+  el.className = type;
+  setTimeout(() => { el.textContent = ''; el.className = ''; }, 3500);
+}
+
+// --- LIVE VIEW ---
+function renderLive() {
+  const el = document.getElementById('liveView');
+  const byType = getByType();
+  const active = OBJ_TYPES.filter(t => byType[t].length > 0);
+  if (!active.length) {
+    el.innerHTML = `<div class="empty"><div class="icon">🙋</div><p style="font-size:15px">No submissions yet.</p><p style="font-size:13px;margin-top:6px">Share the session code with your team!</p></div>`;
+    return;
+  }
+  el.innerHTML = active.map(type => `
+    <div style="margin-bottom:22px">
+      <div class="section-head">
+        <div class="section-bar" style="background:${COLORS[type]}"></div>
+        <h3 style="color:${COLORS[type]};font-size:15px;font-weight:700">${type}</h3>
+        <span class="badge" style="background:${COLORS[type]}">${byType[type].length}</span>
+      </div>
+      ${byType[type].map(q => `
+        <div class="q-card" style="border-left:4px solid ${COLORS[type]}">
+          <p style="font-size:14px;color:#111827;line-height:1.5">${esc(q.text)}</p>
+          <div class="q-meta">— ${esc(q.submitter)} · ${new Date(q.timestamp).toLocaleTimeString()}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// --- AI GROUPING ---
+async function groupWithAI() {
+  const anthropicKey = document.getElementById('anthropicKey').value.trim();
+  if (!anthropicKey) { alert('Please enter your Anthropic API key above.'); return; }
+  if (!questions.length) { alert('No submissions to group yet.'); return; }
+  const btn = document.getElementById('groupBtn');
+  btn.disabled = true; btn.textContent = '🤖 Analyzing…';
+  document.getElementById('groupedView').innerHTML = `<div class="empty"><div class="icon">🤖</div><p>Claude is analyzing your questions…</p></div>`;
+  const prompt = `You are organizing questions from a cross-functional team session about an AI chatbot.
+Submissions:
+${questions.map((q,i)=>`${i+1}. [${q.objectType}] ${q.text}`).join('\n')}
+
+Group by object type, then cluster similar questions under a short label. Only include types with at least one question.
+Respond ONLY with raw valid JSON, no markdown, no backticks:
+{"grouped":{"ObjectType":{"clusters":[{"label":"Short Label","questions":["q1","q2"]}]}}}`;
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+    });
+    const d = await r.json();
+    const text = d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    groupedData = JSON.parse(text).grouped;
+    renderGrouped();
+    renderExport();
+  } catch(e) { document.getElementById('groupedView').innerHTML = `<div class="card" style="color:#dc2626">❌ Error: ${e.message}. Check your API key and try again.</div>`; }
+  btn.disabled = false; btn.textContent = '🤖 Auto-Group Now';
+}
+
+function renderGrouped() {
+  if (!groupedData) return;
+  document.getElementById('groupedView').innerHTML = Object.entries(groupedData).map(([type,d])=>`
+    <div style="margin-bottom:26px">
+      <div class="section-head" style="margin-bottom:12px">
+        <div class="section-bar" style="background:${COLORS[type]||'#6b7280'};height:26px"></div>
+        <h2 style="font-size:17px;color:${COLORS[type]||'#374151'}">${type}</h2>
+        <span style="font-size:13px;color:#6b7280">${d.clusters.reduce((a,c)=>a+c.questions.length,0)} questions · ${d.clusters.length} cluster${d.clusters.length!==1?'s':''}</span>
+      </div>
+      ${d.clusters.map(c=>`
+        <div class="cluster">
+          <div class="cluster-label" style="background:${(COLORS[type]||'#6b7280')}18;color:${COLORS[type]||'#374151'}">${esc(c.label)}</div>
+          ${c.questions.map(q=>`<p class="cluster-q" style="border-left-color:${(COLORS[type]||'#6b7280')}60">${esc(q)}</p>`).join('')}
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// --- EXPORT ---
+function renderExport() {
+  const byType = getByType();
+  const active = OBJ_TYPES.filter(t => byType[t].length > 0);
+  document.getElementById('exportRaw').innerHTML = active.length ? active.map(type=>`
+    <div style="margin-bottom:18px">
+      <h4 style="color:${COLORS[type]};font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:7px">
+        <span style="width:10px;height:10px;border-radius:50%;background:${COLORS[type]};display:inline-block"></span>${type} (${byType[type].length})
+      </h4>
+      ${byType[type].map(q=>`
+        <div style="padding:8px 12px;border-left:3px solid ${COLORS[type]};margin-bottom:6px;background:${COLORS[type]}08;border-radius:0 6px 6px 0">
+          <p style="margin:0;font-size:13px;color:#374151">${esc(q.text)}</p>
+          <span style="font-size:11px;color:#9ca3af">${esc(q.submitter)}</span>
+        </div>`).join('')}
+    </div>`).join('') : '<p style="color:#9ca3af;font-size:14px">No submissions yet.</p>';
+
+  const expGrouped = document.getElementById('exportGrouped');
+  if (groupedData) {
+    const md = Object.entries(groupedData).map(([type,d])=>`## ${type}\n\n`+d.clusters.map(c=>`### ${c.label}\n`+c.questions.map(q=>`- ${q}`).join('\n')).join('\n\n')).join('\n\n---\n\n');
+    expGrouped.innerHTML = `<div class="card"><h3 style="margin-bottom:14px;color:#374151">AI-Grouped Export (Markdown)</h3><textarea class="export-textarea" readonly>${md}</textarea><button class="copy-btn" onclick="navigator.clipboard?.writeText(document.querySelector('.export-textarea').value);this.textContent='✅ Copied!';setTimeout(()=>this.textContent='📋 Copy to Clipboard',2000)">📋 Copy to Clipboard</button></div>`;
+  } else {
+    expGrouped.innerHTML = `<div class="info-box">💡 Go to the <strong>AI Grouping</strong> tab and click "Auto-Group Now" to unlock a clustered Markdown export.</div>`;
+  }
+}
+
+// --- UTILS ---
+function getByType() {
+  return OBJ_TYPES.reduce((a,t)=>{ a[t]=questions.filter(q=>q.objectType===t); return a; },{});
+}
+function renderPills() {
+  const byType = getByType();
+  document.getElementById('pillsBar').innerHTML = OBJ_TYPES.map(t=>`
+    <span class="pill" style="background:${COLORS[t]}18;color:${COLORS[t]};border-color:${COLORS[t]}40">${t}${byType[t].length>0?` (${byType[t].length})`:''}</span>`).join('');
+  document.getElementById('countBadge').textContent = questions.length + ' submission' + (questions.length!==1?'s':'');
+}
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function clearAll() {
+  if (!confirm('Clear ALL submissions? This cannot be undone.')) return;
+  questions = []; groupedData = null;
+  await save();
+  renderPills(); renderLive(); renderExport();
+  document.getElementById('groupedView').innerHTML='';
+}
+
+function switchTab(name, el) {
+  ['submit','live','grouped','export'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  if (name==='live') renderLive();
+  if (name==='grouped') renderGrouped();
+  if (name==='export') renderExport();
+}
+</script>
+</body>
+</html>
